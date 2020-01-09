@@ -1,5 +1,5 @@
 # reactive-in-vue-
-关于Vue2和3中是如是实现的响应式数据的
+Vue2中是用Object.defineProperty实现的响应式数据，代码见(myVue2.html)
 现在如果使用Proxy完成数据的响应式处理，改如何去做呢？  
 
 Vue3中就是使用了Proxy，但是看Vue的实现之前，肯定想自己先改造一下试试，然后再看Vue3.0的源码，这样可以看到自己的代码哪里垃圾。  
