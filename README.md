@@ -36,7 +36,7 @@ obj.interests = {
 obj.interests.game[0].name = '侠客风云传'
 ```
 
-然后实现，其实也就是递归proxy，然后注意一下set的对象也要proxy就可以了：  
+然后实现，其实也就是递归proxy，然后注意一下set的对象也要proxy就可以了（项目中的myProxyVue.html）：  
 ```
 const isType = type => target => `[object ${type}]` === Object.prototype.toString.call(target)
 function reactive(target) {
@@ -169,7 +169,7 @@ obj.interests = {
 obj.interests.game[0].name = '侠客风云传'
 ```
 
-但是，这样还是很差的代码，因为每次访问一个属性的时候都会重新创建它的Proxy，即使这些Proxy是完全一样的，所以我们应该把所有创建过的Proxy都使用一个WeakMap存起来，key就是对象， value就是它的Proxy。这样下次获取的时候就从这个WeakMap中获取：  
+但是，这样还是很差的代码，因为每次访问一个属性的时候都会重新创建它的Proxy，即使这些Proxy是完全一样的，所以我们应该把所有创建过的Proxy都使用一个WeakMap存起来，key就是对象， value就是它的Proxy。这样下次获取的时候就从这个WeakMap中获取：（项目中的myProxyVuePro.html）  
 ```
 const isType = type => target => `[object ${type}]` === Object.prototype.toString.call(target)
 const toProxy = new WeakMap()
