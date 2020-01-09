@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        const isType = type => target => `[object ${type}]` === Object.prototype.toString.call(target);
+        const initArrayMethod = function() {
+            const methods = ['push', 'pop', 'shift', 'unshift', 'splice', 'sort', 'reverse'];
+            methods.forEach(method => {
+                const originMethod = Array.prototype[method];
+                Array.prototype[method] = function () {
+                    console.log('监听到了数组方法')
+                    const result = originMethod.apply(this, arguments);
+                    return result;
+                };
+            });
+        };
+        initArrayMethod()
+        const defineReactive = (target, key) => {
+            let val = target[key];
+            observe(val);
+            Object.defineProperty(target, key, {
+                enumerable: true,
+                configurable: true,
+                get() {
+                    return val;
+                },
+                set(newVal) {
+                    val = newVal;
+                    console.log('监听到了set, newVal =', newVal);
+                }
+            });
+        };
+        function def (obj, key, val, enumerable) {
+            Object.defineProperty(obj, key, {
+                value: val,
+                enumerable: !!enumerable,
+                writable: true,
+                configurable: true
+            });
+        }
+        const Observer = (function () {
+            // data下的每个属性都要经过new Observer，如果是对象则要进行遍历，把每个属性都变成响应式的，如果是数组则要使数组能够响应七种方法
+            const Observer = function (target) {
+                def(target, '__ob__', this);
+                if (isType('Object')(target)) {
+                    this.walk(target);
+                }
+                else if (isType('Array')(target)) {
+                    this.observeArray(target)
+                }
+            };
+            Observer.prototype.walk = target => {
+                Object.keys(target).forEach(key => {
+                    defineReactive(target, key);
+                });
+            };
+            Observer.prototype.observeArray = function observeArray(items) {
+                items.forEach(item => {
+                    observe(item)
+                })
+            }
+            return Observer;
+        })();
+        function callHook(vm, lifecycle) {
+            vm[lifecycle]()
+        }
+        function observe(data) {
+            if (isType('Object')(data) || isType('Array')(data)) {
+                new Observer(data);
+            }
+        }
+        function Vue(options) {
+            this._init(options)
+        }
+        function initState(vm) {
+            initData(vm)
+            initComputed(vm)
+        }
+        function proxy(vm, data) {
+            Object.keys(data).forEach(key => {
+                Object.defineProperty(vm, key, {
+                    get() {
+                        return vm._data[key]
+                    },
+                    set(newVal) {
+                        vm._data[key] = newVal
+                    }
+                })
+            })
+        }
+        function initData(vm) {
+            var data = vm.$options.data.call(vm)
+            vm._data = data
+            proxy(vm, data)
+            callHook(vm, 'created')
+            observe(data)
+            callHook(vm, 'mounted')
+        }
+        function initComputed() {
+        }
+        function initLifecycle(vm) {
+            const cycles = ['created', 'mounted']
+            cycles.forEach(cycle => {
+                vm[cycle] = vm.$options[cycle]
+            })
+        }
+        function initMixin() {
+            Vue.prototype._init = function (options) {
+                let vm = this
+                this.$options = options
+                initLifecycle(vm);
+                initState(vm)
+            }
+        }
+        initMixin()
+        new Vue({
+            el: '#app',
+            data() {
+                return {
+                    name: 'chenbj',
+                    age: '22',
+                    gender: 'male',
+                    skills: {
+                        
+                    }
+                };
+            },
+            created() {
+                // this.relationShip.parents.push('chen')
+            },
+            mounted() {
+                console.log(this)
+                this.name = 'chenbaijin'
+            },
+        })
+    </script>
+</body>
+
+</html>

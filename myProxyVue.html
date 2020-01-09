@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        const isType = type => target => `[object ${type}]` === Object.prototype.toString.call(target)
+        function reactive(target) {
+            const _proxy = target => {
+                if(!isType('Object')(target) && !isType('Array')(target)) {
+                    return target
+                }
+                for(let item in target) {
+                    let currentTarget = target[item]
+                    if(isType('Object')(currentTarget) || isType('Array')(currentTarget)) {
+                        target[item] = _proxy(currentTarget)
+                    }
+                }
+                return new Proxy(target, {
+                    get(target, key) {
+                        return Reflect.get(target, key)
+                    },
+                    set(target, key, value) {
+                        console.log('检测到数据变化')
+                        return Reflect.set(target, key, _proxy(value))
+                    }
+                })
+            }
+            return _proxy(target)
+        }
+        let obj = {
+            count: 0,
+            name: 'chenbj',
+        }
+        obj = reactive(obj)
+        obj.interests = {
+            game: [{
+                name: '三国：全面战争',
+                duration: '120h'
+            }]
+        }
+        obj.interests.game[0].name = '侠客风云传'
+    </script>
+</body>
+</html>

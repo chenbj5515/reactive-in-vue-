@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script src="./vue.global.js"></script>
+</head>
+<body>
+  <div id="app"></div>
+  <script>
+    const { reactive, computed, effect, watch, createApp } = Vue
+    const App = {
+      template: `
+        <div id="box">
+            <button @click="increment">{{ state.interests.game[0].name }}</button>
+        </div> 
+      `,
+      setup() {
+        const state = reactive({
+          count: 0,
+          interests: {
+            game: [{
+                name: '三国：全面战争',
+                duration: '120h'
+            }]
+          }
+        })
+        function increment(e) {
+          state.interests.game[0].name = '侠客风云传'
+        }
+        effect(() => {
+          console.log(state, state.interests.game[0].name)
+        })
+        return {
+          state,
+          increment
+        }
+      }
+    }
+    createApp().mount(App, '#app')
+  </script>
+</body>
+</html>
