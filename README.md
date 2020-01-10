@@ -130,7 +130,8 @@ obj.interests.game[0].name = '侠客风云传'
 
 这个令人疑惑的点是：为什么interest不是一个Proxy，但是点击设置interest下的数据的时候还能在模版上响应？  
 
-本来想在源码中看看为什么，但是没太看懂，所以还是故技重施想在github上找个vue3-lite之类的东西看看，就找到了这个项目：https://github.com/shengxinjing/kkb-vue3，在这里看响应式原理部分就很容易看懂了。  
+本来想在源码中看看为什么，但是没太看懂，所以还是故技重施想在github上找个vue3-lite之类的东西看看，就找到了这个项目：https://github.com/shengxinjing/kkb-vue3  
+在这里看响应式原理部分就很容易看懂了。  
 
 如果你输出state.interest，state.interest.game或者state.interest.game[0]，你会发现他们其实也是Proxy。但为什么输出state时不是Proxy呢，因为其实输出state的时候，你并没有get或set其下的数据，所以它也没有必要是一个Proxy，只有访问了一个对象的时候它才有必要是Proxy的。  
 
